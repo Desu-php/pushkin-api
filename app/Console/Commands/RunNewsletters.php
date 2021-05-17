@@ -53,8 +53,12 @@ class RunNewsletters extends Command
             $newsletter->status_id = 3;
             $newsletter->save();
         }
-        $newsletter->status_id = 2;
-        $newsletter->save();
+
+        if (!empty($newsletter)){
+            $newsletter->status_id = 2;
+            $newsletter->save();
+        }
+
         return 0;
     }
 }
