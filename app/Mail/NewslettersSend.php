@@ -35,8 +35,10 @@ class NewslettersSend extends Mailable
     {
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadView('pdf.pdf', ['contestant' => $this->contestant])->save(storage_path('app/doc.pdf'));
-        return $this->attach(storage_path('app/doc.pdf'),[
-            'as' => 'Грамота',
+
+        return $this->markdown('mail.mail')
+        ->attach(storage_path('app/doc.pdf'),[
+            'as' => 'Грамота.pdf',
         ])->subject('Грамота за участие');
     }
 }
