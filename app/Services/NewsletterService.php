@@ -5,6 +5,7 @@ namespace App\Services;
 
 
 use App\Models\Newsletter;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 
 class NewsletterService
@@ -15,33 +16,46 @@ class NewsletterService
         $this->newsletter = new Newsletter();
     }
 
-    public function pagination(): JsonResponse
+    public function pagination($status = ''): JsonResponse
     {
-        return response()->json(Newsletter::with([
+       $newsletter = Newsletter::with([
             'status',
             'contestant'
-        ])->paginate());
+        ]);
+
+       $newsletter = $this->status($newsletter, $status);
+
+        return response()->json($newsletter->paginate());
     }
 
-    public function getAll(): JsonResponse
+    public function getAll($status = ''): JsonResponse
     {
-        return response()->json(Newsletter::with([
+        $newsletter = Newsletter::with([
             'status',
             'contestant'
-        ])->get());
+        ]);
+
+        $newsletter = $this->status($newsletter, $status);
+
+        return response()->json($newsletter->get());
     }
 
-    public function getByStatus($statusId): JsonResponse
+    public function getByStatus($statusId, $status = ''): JsonResponse
     {
-        return response()->json(Newsletter::with([
+       $newsletter = Newsletter::with([
             'status',
             'contestant'
-        ])->where('status_id', $statusId)->get());
+        ])->where('status_id', $statusId);
+
+       $newsletter = $this->status($newsletter, $status);
+
+        return response()->json($newsletter->get());
     }
 
-    public function getCountStatus(): JsonResponse
+    public function getCountStatus($status = ''): JsonResponse
     {
         $newsletters = Newsletter::with('status')->get();
+        $newsletters = $this->status($newsletters, $status);
         $results = [];
         $temps = [];
         foreach ($newsletters as $newsletter) {
@@ -61,10 +75,20 @@ class NewsletterService
 
     public function start($contestantId, $statusId)
     {
-        $newletter =  Newsletter::firstOrCreate(
+        $newletter = Newsletter::firstOrCreate(
             ['contestant_id' => $contestantId],
             ['status_id' => $statusId]
         );
+    }
+
+    private function status($newsletter, $status)
+    {
+        if (!empty($status)) {
+            $newsletter->whereHas('contestant.application.status', function (Builder $builder) use ($status) {
+                $builder->where('status', $status);
+            });
+        }
+        return $newsletter;
     }
 
 }

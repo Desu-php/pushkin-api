@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\NewsletterRequest;
+use App\Http\Requests\StartNewsletterRequest;
 use App\Models\Contestant;
 use App\Models\NewsletterStatus;
 use App\Services\NewsletterService;
@@ -20,31 +22,31 @@ class NewsletterController extends Controller
 //        $this->middleware('jwt.auth');
     }
 
-    public function index(): JsonResponse
+    public function index(NewsletterRequest $request): JsonResponse
     {
-        return $this->newsletterService->pagination();
+        return $this->newsletterService->pagination($request->status);
     }
 
-    public function getAll(): JsonResponse
+    public function getAll(NewsletterRequest $request): JsonResponse
     {
-        return $this->newsletterService->getAll();
+        return $this->newsletterService->getAll($request->status);
     }
 
-    public function getByStatus(NewsletterStatus $newsletterStatus): JsonResponse
+    public function getByStatus(NewsletterRequest $request,NewsletterStatus $newsletterStatus): JsonResponse
     {
-        return $this->newsletterService->getByStatus($newsletterStatus->id);
+        return $this->newsletterService->getByStatus($newsletterStatus->id,$request->status);
     }
 
-    public function getCountStatus(): JsonResponse
+    public function getCountStatus(NewsletterRequest $request): JsonResponse
     {
-        return $this->newsletterService->getCountStatus();
+        return $this->newsletterService->getCountStatus($request->status);
     }
 
-    public function start() : JsonResponse
+    public function start(StartNewsletterRequest  $request) : JsonResponse
     {
-        $contestants = Contestant::whereHas('application', function (Builder $builder){
-           $builder->whereHas('status', function (Builder  $builder){
-                $builder->where('status', 'success');
+        $contestants = Contestant::whereHas('application', function (Builder $builder) use($request){
+           $builder->whereHas('status', function (Builder  $builder) use ($request){
+                $builder->where('status', $request->status);
            });
         })->get();
 
