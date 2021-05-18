@@ -15,8 +15,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::get('/', function () {
-    $contestand = \App\Models\Contestant::find(1);
-
-    Mail::to('ledforyou.online@gmail.com')
-        ->send(new NewslettersSend($contestand));
+//    $contestand = \App\Models\Contestant::find(1);
+//
+//    Mail::to('ledforyou.online@gmail.com')
+//        ->send(new NewslettersSend($contestand));
 });
