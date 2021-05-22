@@ -4,6 +4,7 @@
 namespace App\Services;
 
 
+use App\Models\ApplicationStatus;
 use App\Models\Newsletter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -18,12 +19,12 @@ class NewsletterService
 
     public function pagination($status = ''): JsonResponse
     {
-       $newsletter = Newsletter::with([
+        $newsletter = Newsletter::with([
             'status',
             'contestant'
         ]);
 
-       $newsletter = $this->status($newsletter, $status);
+        $newsletter = $this->status($newsletter, $status);
 
         return response()->json($newsletter->paginate());
     }
@@ -42,34 +43,40 @@ class NewsletterService
 
     public function getByStatus($statusId, $status = ''): JsonResponse
     {
-       $newsletter = Newsletter::with([
+        $newsletter = Newsletter::with([
             'status',
             'contestant'
         ])->where('status_id', $statusId);
 
-       $newsletter = $this->status($newsletter, $status);
+        $newsletter = $this->status($newsletter, $status);
 
         return response()->json($newsletter->get());
     }
 
     public function getCountStatus($status = ''): JsonResponse
     {
-        $newsletters = Newsletter::with('status')->get();
-        $newsletters = $this->status($newsletters, $status);
+
+        $statuses = ApplicationStatus::whereNotNull('description')->get();
         $results = [];
-        $temps = [];
-        foreach ($newsletters as $newsletter) {
-            if (!in_array($newsletter->status->status, $temps)) {
-                $results[$newsletter->status->status] = [
-                    'count' => 1,
-                    'id' => $newsletter->status->id,
-                    'title' => $newsletter->status->title,
-                ];
-                $temps[] = $newsletter->status->status;
-            } else {
-                $results[$newsletter->status->status]['count']++;
+        foreach ($statuses as $status) {
+            $newsletters = Newsletter::with('status');
+            $newsletters = $this->status($newsletters, $status->status);
+            $temps = [];
+            foreach ($newsletters->get() as $newsletter) {
+                if (!in_array($newsletter->status->status, $temps)) {
+                    $results[$status->description][$newsletter->status->status] = [
+                        'count' => 1,
+                        'id' => $newsletter->status->id,
+                        'title' => $newsletter->status->title,
+                    ];
+                    $temps[] = $newsletter->status->status;
+                } else {
+                    $results[$status->description][$newsletter->status->status]['count']++;
+                }
             }
+            $results[$status->description]['status'] = $status->status;
         }
+
         return response()->json($results);
     }
 

@@ -13,7 +13,7 @@
     }
 
     body {
-        font-family: DejaVu Sans, sans-serif;
+        font-family: "Times New Roman", Times, serif;
         width: 100%;
         margin-left: -50px;
         margin-right: -50px;

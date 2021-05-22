@@ -15,8 +15,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::get('/', function () {
-//    $contestand = \App\Models\Contestant::find(1);
+    $contestant  = \App\Models\Contestant::find(1);
+    return view('pdf.pdf', compact('contestant'));
 //
-//    Mail::to('ledforyou.online@gmail.com')
-//        ->send(new NewslettersSend($contestand));
+    Mail::to('ledforyou.online@gmail.com')
+        ->send(new NewslettersSend($contestand));
 });

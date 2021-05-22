@@ -14,13 +14,21 @@ class ApplicationStatusSeeder extends Seeder
      */
     public function run()
     {
-        $statuses =[
-            ['title'=>'В обработке', 'status' => 'in_progress'],
-            ['title'=>'Не корректные данные', 'status' => 'in_correct'],
+        $statuses = [
+            ['title' => 'В обработке', 'status' => 'in_progress', 'description' => null],
+            ['title' => 'Не корректные данные', 'status' => 'in_correct', 'description' => null],
+            ['title' => 'Успешно', 'status' => 'success', 'description' => 'Грамота'],
         ];
 
         foreach ($statuses as $status) {
-            ApplicationStatus::create($status);
+            ApplicationStatus::updateOrCreate([
+                'status' => $status['status'],
+            ],
+                [
+                    'title' => $status['title'],
+                    'description' => $status['description']
+                ]
+            );
         }
     }
 }

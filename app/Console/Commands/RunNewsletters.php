@@ -41,20 +41,21 @@ class RunNewsletters extends Command
      */
     public function handle()
     {
-      $newsletter = Newsletter::whereHas('status', function (Builder $builder){
+        sleep(1);
+        $newsletter = Newsletter::whereHas('status', function (Builder $builder) {
             $builder->where('status', 'in_queue');
         })->first();
         try {
-            if (!empty($newsletter)){
+            if (!empty($newsletter)) {
                 Mail::to($newsletter->contestant->email)
                     ->send(new NewslettersSend($newsletter->contestant));
             }
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             $newsletter->status_id = 3;
             $newsletter->save();
         }
 
-        if (!empty($newsletter)){
+        if (!empty($newsletter)) {
             $newsletter->status_id = 2;
             $newsletter->save();
         }
