@@ -135,6 +135,7 @@ Route::group([
 
 Route::group([
     'prefix' => 'newsletters',
+    'middleware' => ['auth:api','admin']
 ], function () {
     Route::get('/', [NewsletterController::class, 'index']);
     Route::get('getAll', [NewsletterController::class, 'getAll']);
